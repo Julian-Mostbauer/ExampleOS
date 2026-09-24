@@ -1,50 +1,55 @@
-# Toolchain configuration
 CC      := gcc
-CFLAGS  := -m32 -ffreestanding -fno-pie -fno-stack-protector -nostdlib -Wall -Wextra
+CFLAGS  := -m32 -ffreestanding -fno-pie -fno-stack-protector -nostdlib -Wall -Wextra -I src/kernel/include
 LD      := ld
 LDFLAGS := -m elf_i386 -T src/kernel/linker.ld --oformat binary
 NASM    := nasm
 QEMU    := qemu-system-x86_64
 
-# Directory configuration
 SRC_DIR   := src
 BUILD_DIR := build
 
-# Output targets
+# C source files across subsystems
+C_SRCS := src/kernel/kernel.c \
+          src/kernel/cpu/idt.c \
+          src/kernel/cpu/pic.c \
+          src/kernel/drivers/vga.c \
+          src/kernel/drivers/keyboard.c \
+          src/kernel/lib/string.c \
+          src/kernel/shell/shell.c
+
+C_OBJS := $(patsubst src/kernel/%.c, $(BUILD_DIR)/kernel/%.o, $(C_SRCS))
+
 OS_BIN := $(BUILD_DIR)/os.bin
 
 all: $(OS_BIN)
 
-# Ensure build directory exists
-$(BUILD_DIR):
-	mkdir -p $(BUILD_DIR)
-
 # 1. 16-bit Bootloader
-$(BUILD_DIR)/boot.bin: $(SRC_DIR)/boot/boot.asm | $(BUILD_DIR)
+$(BUILD_DIR)/boot.bin: $(SRC_DIR)/boot/boot.asm
+	@mkdir -p $(BUILD_DIR)
 	$(NASM) -f bin $< -o $@
 
 # 2. Kernel Assembly Entry
-$(BUILD_DIR)/kernel_entry.o: $(SRC_DIR)/kernel/kernel_entry.asm | $(BUILD_DIR)
+$(BUILD_DIR)/kernel_entry.o: $(SRC_DIR)/kernel/kernel_entry.asm
+	@mkdir -p $(BUILD_DIR)
 	$(NASM) -f elf32 $< -o $@
 
-# 3. Kernel C code
-$(BUILD_DIR)/kernel.o: $(SRC_DIR)/kernel/kernel.c | $(BUILD_DIR)
+# 3. Compile C Modules
+$(BUILD_DIR)/kernel/%.o: $(SRC_DIR)/kernel/%.c
+	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # 4. Link Kernel binary
-$(BUILD_DIR)/kernel.bin: $(BUILD_DIR)/kernel_entry.o $(BUILD_DIR)/kernel.o $(SRC_DIR)/kernel/linker.ld | $(BUILD_DIR)
-	$(LD) $(LDFLAGS) $(BUILD_DIR)/kernel_entry.o $(BUILD_DIR)/kernel.o -o $@
+$(BUILD_DIR)/kernel.bin: $(BUILD_DIR)/kernel_entry.o $(C_OBJS) $(SRC_DIR)/kernel/linker.ld
+	$(LD) $(LDFLAGS) $(BUILD_DIR)/kernel_entry.o $(C_OBJS) -o $@
 
-# 5. Combine into raw bootable disk image (padded to 16KB)
-$(OS_BIN): $(BUILD_DIR)/boot.bin $(BUILD_DIR)/kernel.bin | $(BUILD_DIR)
+# 5. Raw bootable disk image (padded to 16KB)
+$(OS_BIN): $(BUILD_DIR)/boot.bin $(BUILD_DIR)/kernel.bin
 	cat $(BUILD_DIR)/boot.bin $(BUILD_DIR)/kernel.bin > $@
 	truncate -s 16K $@
 
-# Run in QEMU
 run: $(OS_BIN)
 	$(QEMU) -drive format=raw,file=$(OS_BIN)
 
-# Clean build artifacts
 clean:
 	rm -rf $(BUILD_DIR)
 

@@ -1,6 +1,6 @@
 bits 32
 extern kmain
-extern keyboard_handler_main
+extern keyboard_isr_handler
 global _start
 global isr_keyboard
 
@@ -16,13 +16,13 @@ isr_keyboard:
     push fs
     push gs
 
-    mov ax, 0x10    ; Load kernel data segment descriptor
+    mov ax, 0x10
     mov ds, ax
     mov es, ax
     mov fs, ax
     mov gs, ax
 
-    call keyboard_handler_main
+    call keyboard_isr_handler
 
     pop gs
     pop fs
