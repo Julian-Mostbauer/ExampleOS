@@ -51,7 +51,7 @@ void vga_draw_status_bar(void) {
     }
 
     // Title on left
-    const char *title = " SimpleOS 32-bit Kernel ";
+    const char *title = " ExampleOS 32-bit Kernel ";
     for (int i = 0; title[i] != '\0' && i < VGA_WIDTH; i++) {
         video[i * 2]     = title[i];
         video[i * 2 + 1] = bar_color;
