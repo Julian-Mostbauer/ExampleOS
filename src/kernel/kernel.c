@@ -141,6 +141,30 @@ void draw_status_bar(void) {
     }
 }
 
+// ------------------------------------------------------------
+// VGA Hardware Cursor Control
+// ------------------------------------------------------------
+void update_cursor(int row, int col) {
+    uint16_t pos = row * VGA_WIDTH + col;
+
+    // Send low byte to CRTC register 0x0F
+    outb(0x3D4, 0x0F);
+    outb(0x3D5, (uint8_t)(pos & 0xFF));
+
+    // Send high byte to CRTC register 0x0E
+    outb(0x3D4, 0x0E);
+    outb(0x3D5, (uint8_t)((pos >> 8) & 0xFF));
+}
+
+void enable_cursor(uint8_t cursor_start, uint8_t cursor_end) {
+    // Configure cursor scanlines (shape) and enable blinking
+    outb(0x3D4, 0x0A);
+    outb(0x3D5, (inb(0x3D5) & 0xC0) | cursor_start);
+
+    outb(0x3D4, 0x0B);
+    outb(0x3D5, (inb(0x3D5) & 0xE0) | cursor_end);
+}
+
 void clear_screen(void) {
     volatile char *video = (volatile char *)VGA_ADDRESS;
 
@@ -153,6 +177,7 @@ void clear_screen(void) {
     cursor_row = 1;
     cursor_col = 0;
     draw_status_bar();
+    update_cursor(cursor_row, cursor_col);
 }
 
 static void scroll(void) {
@@ -181,6 +206,7 @@ void putchar(char c) {
         cursor_col = 0;
         cursor_row++;
         scroll();
+        update_cursor(cursor_row, cursor_col);
         return;
     }
 
@@ -191,6 +217,7 @@ void putchar(char c) {
             video[offset]     = ' ';
             video[offset + 1] = current_color;
         }
+        update_cursor(cursor_row, cursor_col);
         return;
     }
 
@@ -204,6 +231,7 @@ void putchar(char c) {
     video[offset]     = c;
     video[offset + 1] = current_color;
     cursor_col++;
+    update_cursor(cursor_row, cursor_col);
 }
 
 void print(const char *str) {
@@ -423,6 +451,7 @@ int strcmp(const char *s1, const char *s2) {
 // Shell & Main Entry
 // ------------------------------------------------------------
 void kmain(void) {
+    enable_cursor(14, 15);
     clear_screen();
 
     print_color("Welcome to SimpleOS!\n", MAKE_COLOR(COLOR_LIGHT_CYAN, COLOR_BLACK));
