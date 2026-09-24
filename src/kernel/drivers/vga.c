@@ -1,5 +1,6 @@
 #include "vga.h"
 #include "io.h"
+#include "version.h"
 
 static int cursor_row = 1;
 static int cursor_col = 0;
@@ -51,7 +52,7 @@ void vga_draw_status_bar(void) {
     }
 
     // Title on left
-    const char *title = " ExampleOS 32-bit Kernel ";
+    const char *title = " " OS_NAME " 32-bit Kernel ";
     for (int i = 0; title[i] != '\0' && i < VGA_WIDTH; i++) {
         video[i * 2]     = title[i];
         video[i * 2 + 1] = bar_color;

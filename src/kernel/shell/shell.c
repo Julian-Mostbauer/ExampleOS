@@ -2,12 +2,13 @@
 #include "vga.h"
 #include "keyboard.h"
 #include "string.h"
+#include "version.h"
 
 void shell_run(void)
 {
     char input[64];
 
-    vga_print_color("Welcome to ExampleOS!\n", MAKE_COLOR(COLOR_LIGHT_CYAN, COLOR_BLACK));
+    vga_print_color("Welcome to " OS_NAME "!\n", MAKE_COLOR(COLOR_LIGHT_CYAN, COLOR_BLACK));
     vga_print_color("Keyboard: German Standard (QWERTZ) active. Press F1 to toggle.\n", MAKE_COLOR(COLOR_LIGHT_GREEN, COLOR_BLACK));
     vga_print_color("Type 'help' to see commands, or 'layout [de|us]' to change.\n\n", MAKE_COLOR(COLOR_LIGHT_GRAY, COLOR_BLACK));
 
@@ -52,7 +53,7 @@ void shell_run(void)
         }
         else if (strcmp(input, "about") == 0)
         {
-            vga_print_color("ExampleOS v0.3\n", MAKE_COLOR(COLOR_YELLOW, COLOR_BLACK));
+            vga_print_color(OS_NAME " v" OS_VERSION "\n", MAKE_COLOR(COLOR_YELLOW, COLOR_BLACK));
             vga_print("Architecture: x86 32-bit Protected Mode\n");
             vga_print("Subsystems: CPU (IDT, PIC), Drivers (VGA, Keyboard), Lib, Shell\n");
         }
