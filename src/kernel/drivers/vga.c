@@ -33,6 +33,12 @@ void vga_enable_cursor(uint8_t start, uint8_t end) {
     outb(0x3D5, (inb(0x3D5) & 0xE0) | end);
 }
 
+void vga_disable_cursor(void)
+{
+	outb(0x3D4, 0x0A);
+	outb(0x3D5, 0x20);
+}
+
 void vga_draw_status_bar(void) {
     volatile char *video = (volatile char *)VGA_ADDRESS;
     uint8_t bar_color   = MAKE_COLOR(COLOR_WHITE, COLOR_BLUE);
@@ -88,7 +94,7 @@ void vga_clear_absolute(void){
         video[i * 2 + 1] = current_color;
     }
 
-    vga_update_cursor(0,0);
+    vga_disable_cursor();
 }
 
 static void vga_scroll(void) {

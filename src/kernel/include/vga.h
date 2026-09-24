@@ -35,6 +35,7 @@ void vga_print_color(const char *str, uint8_t color);
 void vga_set_status_badge(const char *badge);
 void vga_update_cursor(int row, int col);
 void vga_enable_cursor(uint8_t start, uint8_t end);
+void vga_disable_cursor(void);
 void vga_draw_status_bar(void);
 
 #endif
