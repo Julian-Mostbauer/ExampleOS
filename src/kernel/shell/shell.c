@@ -27,7 +27,7 @@ void shell_run(void)
             vga_print("  layout [de|us] - View or switch keyboard layout (or press F1)\n");
             vga_print("  clear          - Clear the screen\n");
             vga_print("  about          - Display system information\n");
-            vga_print("  echo           - Repeat greeting message\n");
+            vga_print("  echo           - prints given message\n");
             vga_print("  shutdown       - Ends the running os\n");
             vga_print("  help           - Show this help menu\n");
         }
@@ -57,9 +57,12 @@ void shell_run(void)
             vga_print("Architecture: x86 32-bit Protected Mode\n");
             vga_print("Subsystems: CPU (IDT, PIC), Drivers (VGA, Keyboard), Lib, Shell\n");
         }
-        else if (strcmp(input, "echo") == 0)
+        else if (strncmp(input, "echo", 4) == 0)
         {
-            vga_print("Echo: Hallo aus dem modular strukturierten Kernel!\n");
+            char *msg = input;
+            msg += 5;
+            vga_print(msg);
+            vga_print("\n");
         }
         else if (strcmp(input, "shutdown") == 0)
         {
