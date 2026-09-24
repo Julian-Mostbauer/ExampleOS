@@ -80,6 +80,17 @@ void vga_clear(void) {
     vga_update_cursor(cursor_row, cursor_col);
 }
 
+void vga_clear_absolute(void){
+    volatile char *video = (volatile char *)VGA_ADDRESS;
+
+    for (int i = 0; i < VGA_WIDTH * VGA_HEIGHT; i++) {
+        video[i * 2]     = ' ';
+        video[i * 2 + 1] = current_color;
+    }
+
+    vga_update_cursor(0,0);
+}
+
 static void vga_scroll(void) {
     volatile char *video = (volatile char *)VGA_ADDRESS;
     if (cursor_row >= VGA_HEIGHT) {

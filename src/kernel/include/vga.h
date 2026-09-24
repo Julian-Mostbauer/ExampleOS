@@ -28,6 +28,7 @@
 
 void vga_init(void);
 void vga_clear(void);
+void vga_clear_absolute(void);
 void vga_putchar(char c);
 void vga_print(const char *str);
 void vga_print_color(const char *str, uint8_t color);

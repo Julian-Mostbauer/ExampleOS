@@ -47,10 +47,25 @@ $(OS_BIN): $(BUILD_DIR)/boot.bin $(BUILD_DIR)/kernel.bin
 	cat $(BUILD_DIR)/boot.bin $(BUILD_DIR)/kernel.bin > $@
 	truncate -s 16K $@
 
+# 6. Bootable ISO Image (El Torito Floppy Emulation)
+OS_ISO := $(BUILD_DIR)/os.iso
+
+iso: $(OS_ISO)
+
+$(OS_ISO): $(OS_BIN)
+	@mkdir -p $(BUILD_DIR)/iso_root
+	cp $(OS_BIN) $(BUILD_DIR)/iso_root/floppy.img
+	truncate -s 1440K $(BUILD_DIR)/iso_root/floppy.img
+	xorriso -as mkisofs -b floppy.img -o $@ $(BUILD_DIR)/iso_root
+	@rm -rf $(BUILD_DIR)/iso_root
+
 run: $(OS_BIN)
 	$(QEMU) -drive format=raw,file=$(OS_BIN)
+
+run-iso: $(OS_ISO)
+	$(QEMU) -cdrom $(OS_ISO)
 
 clean:
 	rm -rf $(BUILD_DIR)
 
-.PHONY: all run clean
+.PHONY: all run run-iso iso clean
