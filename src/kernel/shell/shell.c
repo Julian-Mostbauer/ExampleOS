@@ -27,6 +27,7 @@ void shell_run(void)
             vga_print("  clear          - Clear the screen\n");
             vga_print("  about          - Display system information\n");
             vga_print("  echo           - Repeat greeting message\n");
+            vga_print("  shutdown       - Ends the running os\n");
             vga_print("  help           - Show this help menu\n");
         }
         else if (strcmp(input, "layout de") == 0 || strcmp(input, "de") == 0)
