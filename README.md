@@ -2,6 +2,10 @@
 
 A minimal 32-bit x86 hobby operating system written from scratch in C and Assembly.
 
+## Important Sources
+
+https://wiki.osdev.org/
+
 ## Prerequisites
 
 Ensure you have the following installed:
