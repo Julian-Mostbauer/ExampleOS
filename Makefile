@@ -15,7 +15,8 @@ C_SRCS := src/kernel/kernel.c \
           src/kernel/drivers/vga.c \
           src/kernel/drivers/keyboard.c \
           src/kernel/lib/string.c \
-          src/kernel/shell/shell.c
+          src/kernel/shell/shell.c \
+          src/kernel/shell/pong.c
 
 C_OBJS := $(patsubst src/kernel/%.c, $(BUILD_DIR)/kernel/%.o, $(C_SRCS))
 

@@ -221,17 +221,19 @@ void vga_set_mode_03h(void) {
 }
 
 void vga_put_pixel(uint16_t x, uint16_t y, uint8_t color) {
-    if (x >= VGA_GFX_WIDTH || y >= VGA_GFX_HEIGHT) {
+    if (x >= VGA_GFX_WIDTH || y >= VGA_GFX_HEIGHT)
         return;
-    }
+
     volatile uint8_t *video = (volatile uint8_t *)VGA_VIDEO_ADDR;
     video[VGA_GFX_WIDTH * y + x] = color;
 }
 
 void vga_draw_rect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t color) {
+    volatile uint8_t *video = (volatile uint8_t *)VGA_VIDEO_ADDR;
+
     for (uint16_t r = 0; r < h; r++) {
         for (uint16_t c = 0; c < w; c++) {
-            vga_put_pixel(x + c, y + r, color);
+            video[VGA_GFX_WIDTH * (y+r) + (x + c)] = color;
         }
     }
 }
