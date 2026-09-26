@@ -147,12 +147,77 @@ static void write_vga_registers(const uint8_t *regs) {
     outb(0x3C0, 0x20);
 }
 
+static uint8_t font_backup[256 * 16];
+
+void vga_save_font(void) {
+    // 1. Prepare Sequencer to read Plane 2
+    outb(0x3C4, 0x00); outb(0x3C5, 0x01);
+    outb(0x3C4, 0x02); outb(0x3C5, 0x04); // Write map: Plane 2
+    outb(0x3C4, 0x04); outb(0x3C5, 0x07); // Sequential addressing
+    outb(0x3C4, 0x00); outb(0x3C5, 0x03);
+
+    // 2. Prepare Graphics Controller to read Plane 2 at 0xA0000
+    outb(0x3CE, 0x04); outb(0x3CF, 0x02); // Read map: Plane 2
+    outb(0x3CE, 0x05); outb(0x3CF, 0x00);
+    outb(0x3CE, 0x06); outb(0x3CF, 0x00); // 0xA0000
+
+    volatile uint8_t *src = (volatile uint8_t *)VGA_VIDEO_ADDR;
+    for (int c = 0; c < 256; c++) {
+        for (int r = 0; r < 16; r++) {
+            font_backup[c * 16 + r] = src[c * 32 + r];
+        }
+    }
+
+    // 3. Restore text mode controller settings
+    outb(0x3C4, 0x00); outb(0x3C5, 0x01);
+    outb(0x3C4, 0x02); outb(0x3C5, 0x03); // Planes 0 and 1
+    outb(0x3C4, 0x04); outb(0x3C5, 0x02); // Odd/even mode
+    outb(0x3C4, 0x00); outb(0x3C5, 0x03);
+
+    outb(0x3CE, 0x04); outb(0x3CF, 0x00);
+    outb(0x3CE, 0x05); outb(0x3CF, 0x10);
+    outb(0x3CE, 0x06); outb(0x3CF, 0x0E); // 0xB8000
+}
+
+void vga_restore_font(void) {
+    // 1. Prepare Sequencer to write font to Plane 2
+    outb(0x3C4, 0x00); outb(0x3C5, 0x01);
+    outb(0x3C4, 0x02); outb(0x3C5, 0x04); // Write only Plane 2
+    outb(0x3C4, 0x04); outb(0x3C5, 0x07); // Sequential addressing
+    outb(0x3C4, 0x00); outb(0x3C5, 0x03);
+
+    // 2. Prepare Graphics Controller for Plane 2 access at 0xA0000
+    outb(0x3CE, 0x04); outb(0x3CF, 0x02);
+    outb(0x3CE, 0x05); outb(0x3CF, 0x00);
+    outb(0x3CE, 0x06); outb(0x3CF, 0x00); // 0xA0000
+
+    volatile uint8_t *dest = (volatile uint8_t *)VGA_VIDEO_ADDR;
+    for (int c = 0; c < 256; c++) {
+        for (int r = 0; r < 16; r++) {
+            dest[c * 32 + r] = font_backup[c * 16 + r];
+        }
+    }
+
+    // 3. Restore text mode controller settings
+    outb(0x3C4, 0x00); outb(0x3C5, 0x01);
+    outb(0x3C4, 0x02); outb(0x3C5, 0x03); // Enable planes 0 and 1
+    outb(0x3C4, 0x04); outb(0x3C5, 0x02); // Odd/even mode
+    outb(0x3C4, 0x00); outb(0x3C5, 0x03);
+
+    outb(0x3CE, 0x04); outb(0x3CF, 0x00);
+    outb(0x3CE, 0x05); outb(0x3CF, 0x10);
+    outb(0x3CE, 0x06); outb(0x3CF, 0x0E); // 0xB8000
+}
+
 void vga_set_mode_13h(void) {
     write_vga_registers(mode_13h_regs);
 }
 
 void vga_set_mode_03h(void) {
     write_vga_registers(mode_03h_regs);
+    vga_restore_font();
+    write_vga_registers(mode_03h_regs);
+    vga_enable_cursor(14, 15);
 }
 
 void vga_put_pixel(uint16_t x, uint16_t y, uint8_t color) {
@@ -272,6 +337,7 @@ void vga_print_color(const char *str, uint8_t color) {
 }
 
 void vga_init(void) {
+    vga_save_font();
     vga_enable_cursor(14, 15);
     vga_clear();
 }
