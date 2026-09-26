@@ -16,6 +16,10 @@ static char kb_buffer[KB_BUFFER_SIZE];
 static volatile int kb_head = 0;
 static volatile int kb_tail = 0;
 
+// Key state table (1 = held down, 0 = released).
+// 0..127: Normal keys. 128..255: Extended keys (e.g. arrow keys).
+static volatile uint8_t key_states[256];
+
 // --- US QWERTY Tables ---
 static const char scancode_us_normal[128] = {
     0,   27,  '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', '\b',
@@ -83,6 +87,23 @@ char getchar(void) {
     return c;
 }
 
+int keyboard_has_char(void) {
+    return kb_head != kb_tail;
+}
+
+char keyboard_getchar_async(void) {
+    if (kb_head == kb_tail) {
+        return 0;
+    }
+    char c = kb_buffer[kb_tail];
+    kb_tail = (kb_tail + 1) % KB_BUFFER_SIZE;
+    return c;
+}
+
+int keyboard_is_key_down(uint8_t scancode) {
+    return key_states[scancode];
+}
+
 int readline(char *buf, int max_len) {
     int count = 0;
     while (1) {
@@ -134,7 +155,7 @@ const char *keyboard_get_layout_name(void) {
 void keyboard_isr_handler(void) {
     uint8_t scancode = inb(0x60);
 
-    // Extended scancode (AltGr sends 0xE0 0x38)
+    // Extended scancode (0xE0 prefix, e.g. arrow keys, AltGr)
     if (scancode == 0xE0) {
         is_extended = 1;
         pic_send_eoi(1);
@@ -143,6 +164,12 @@ void keyboard_isr_handler(void) {
 
     if (is_extended) {
         is_extended = 0;
+        uint8_t make_code = scancode & 0x7F;
+        uint8_t pressed = !(scancode & 0x80);
+
+        // Record extended key state in high half of table (128..255)
+        key_states[make_code | KEY_EXT_BIT] = pressed;
+
         if (scancode == 0x38) {
             altgr_active = 1;
         } else if (scancode == 0xB8) {
@@ -152,6 +179,11 @@ void keyboard_isr_handler(void) {
         return;
     }
 
+    // Normal keys (0..127)
+    uint8_t make_code = scancode & 0x7F;
+    uint8_t pressed = !(scancode & 0x80);
+    key_states[make_code] = pressed;
+
     // Shift
     if (scancode == 0x2A || scancode == 0x36) {
         shift_active = 1;
@@ -159,31 +191,31 @@ void keyboard_isr_handler(void) {
         shift_active = 0;
     }
     // Caps Lock
-    else if (scancode == 0x3A) {
+    else if (scancode == 0x3A && pressed) {
         caps_lock = !caps_lock;
     }
     // F1: Hotkey to toggle layout
-    else if (scancode == 0x3B) {
+    else if (scancode == 0x3B && pressed) {
         keyboard_toggle_layout();
     }
-    // Normal key press
-    else if (!(scancode & 0x80) && scancode < 128) {
+    // Normal key press (Make code only)
+    else if (pressed && make_code < 128) {
         char ch = 0;
         int upper = shift_active ^ caps_lock;
 
         if (current_layout == LAYOUT_DE) {
             if (altgr_active) {
-                ch = scancode_de_altgr[scancode];
+                ch = scancode_de_altgr[make_code];
             } else if (upper) {
-                ch = scancode_de_shift[scancode];
+                ch = scancode_de_shift[make_code];
             } else {
-                ch = scancode_de_normal[scancode];
+                ch = scancode_de_normal[make_code];
             }
         } else {
             if (upper) {
-                ch = scancode_us_shift[scancode];
+                ch = scancode_us_shift[make_code];
             } else {
-                ch = scancode_us_normal[scancode];
+                ch = scancode_us_normal[make_code];
             }
         }
 
@@ -196,5 +228,10 @@ void keyboard_isr_handler(void) {
 }
 
 void keyboard_init(void) {
+    for (int i = 0; i < 256; i++) {
+        key_states[i] = 0;
+    }
+    kb_head = 0;
+    kb_tail = 0;
     keyboard_set_layout(LAYOUT_DE);
 }

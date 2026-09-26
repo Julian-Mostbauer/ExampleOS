@@ -33,5 +33,10 @@
     "directory": "/home/julian/Projects/test_os",
     "command": "gcc -m32 -ffreestanding -fno-pie -fno-stack-protector -nostdlib -Wall -Wextra -I src/kernel/include -c src/kernel/shell/shell.c",
     "file": "src/kernel/shell/shell.c"
+  },
+  {
+    "directory": "/home/julian/Projects/test_os",
+    "command": "gcc -m32 -ffreestanding -fno-pie -fno-stack-protector -nostdlib -Wall -Wextra -I src/kernel/include -c src/kernel/shell/pong.c",
+    "file": "src/kernel/shell/pong.c"
   }
 ]
