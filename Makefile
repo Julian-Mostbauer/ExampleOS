@@ -65,6 +65,9 @@ run: $(OS_BIN)
 run-iso: $(OS_ISO)
 	$(QEMU) -cdrom $(OS_ISO)
 
+clean:
+	rm -rf $(BUILD_DIR)
+
 build: all
 
 compile_commands:
@@ -77,3 +80,14 @@ compile_commands:
 	print('Generated compile_commands.json for CLion / Clangd')"
 
 .PHONY: all run run-iso iso clean build compile_commands
+
+# Ensure dry-run (--just-print / -n) always emits compilation commands for IDEs like CLion
+ifeq ($(findstring n,$(MAKEFLAGS)),n)
+.PHONY: FORCE
+$(BUILD_DIR)/boot.bin: FORCE
+$(BUILD_DIR)/kernel_entry.o: FORCE
+$(C_OBJS): FORCE
+$(BUILD_DIR)/kernel.bin: FORCE
+$(OS_BIN): FORCE
+all: FORCE
+endif
