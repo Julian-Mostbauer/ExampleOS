@@ -28,6 +28,7 @@ void shell_run(void)
             vga_print("  clear          - Clear the screen\n");
             vga_print("  about          - Display system information\n");
             vga_print("  echo           - prints given message\n");
+            vga_print("  paint          - Switch to 320x200 graphics mode and paint pixels\n");
             vga_print("  shutdown       - Ends the running os\n");
             vga_print("  help           - Show this help menu\n");
         }
@@ -68,6 +69,38 @@ void shell_run(void)
         {
             vga_clear_absolute();
             break;
+        }
+        else if (strcmp(input, "paint") == 0 || strcmp(input, "graphics") == 0)
+        {
+            // 1. Switch to 320x200 256-color graphics mode
+            vga_set_mode_13h();
+
+            // 2. Clear background to dark blue (color 1)
+            vga_clear_screen_color(1);
+
+            // 3. Draw a 256-color palette gradient bar (using vga_put_pixel!)
+            for (uint16_t x = 0; x < 256; x++) {
+                for (uint16_t y = 15; y < 35; y++) {
+                    vga_put_pixel(32 + x, y, (uint8_t)x);
+                }
+            }
+
+            // 4. Draw demo rectangles (using vga_draw_rect)
+            vga_draw_rect(32, 50, 50, 40, 4);   // Red
+            vga_draw_rect(92, 50, 50, 40, 2);   // Green
+            vga_draw_rect(152, 50, 50, 40, 14); // Yellow
+            vga_draw_rect(212, 50, 50, 40, 5);  // Magenta
+
+            // White frame & inner cyan box in the center
+            vga_draw_rect(80, 110, 160, 60, 15);
+            vga_draw_rect(85, 115, 150, 50, 3);
+
+            // Wait for user keypress to return to text mode
+            getchar();
+
+            // 5. Restore 80x25 text mode
+            vga_set_mode_03h();
+            vga_clear();
         }
         else
         {

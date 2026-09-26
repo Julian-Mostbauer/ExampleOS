@@ -20,7 +20,7 @@ start:
     ; --------------------------------------------------------
     mov bx, KERNEL_OFFSET   ; ES:BX is target buffer (0x0000:0x1000)
     mov ah, 0x02            ; BIOS read sector function
-    mov al, 15              ; Number of sectors to read (15 * 512 = ~7.5 KB)
+    mov al, 31              ; Number of sectors to read (31 * 512 = 15.5 KB)
     mov ch, 0               ; Cylinder 0
     mov cl, 2               ; Sector 2 (Sector 1 is this bootloader)
     mov dh, 0               ; Head 0
