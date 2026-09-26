@@ -65,7 +65,15 @@ run: $(OS_BIN)
 run-iso: $(OS_ISO)
 	$(QEMU) -cdrom $(OS_ISO)
 
-clean:
-	rm -rf $(BUILD_DIR)
+build: all
 
-.PHONY: all run run-iso iso clean
+compile_commands:
+	@python3 -c "import json, os; \
+	srcs = '$(C_SRCS)'.split(); \
+	flags = '$(CFLAGS)'; \
+	cwd = os.getcwd(); \
+	cmds = [{'directory': cwd, 'command': f'gcc {flags} -c {s}', 'file': s} for s in srcs]; \
+	open('compile_commands.json', 'w').write(json.dumps(cmds, indent=2)); \
+	print('Generated compile_commands.json for CLion / Clangd')"
+
+.PHONY: all run run-iso iso clean build compile_commands

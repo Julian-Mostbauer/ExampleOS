@@ -1,0 +1,37 @@
+[
+  {
+    "directory": "/home/julian/Projects/test_os",
+    "command": "gcc -m32 -ffreestanding -fno-pie -fno-stack-protector -nostdlib -Wall -Wextra -I src/kernel/include -c src/kernel/kernel.c",
+    "file": "src/kernel/kernel.c"
+  },
+  {
+    "directory": "/home/julian/Projects/test_os",
+    "command": "gcc -m32 -ffreestanding -fno-pie -fno-stack-protector -nostdlib -Wall -Wextra -I src/kernel/include -c src/kernel/cpu/idt.c",
+    "file": "src/kernel/cpu/idt.c"
+  },
+  {
+    "directory": "/home/julian/Projects/test_os",
+    "command": "gcc -m32 -ffreestanding -fno-pie -fno-stack-protector -nostdlib -Wall -Wextra -I src/kernel/include -c src/kernel/cpu/pic.c",
+    "file": "src/kernel/cpu/pic.c"
+  },
+  {
+    "directory": "/home/julian/Projects/test_os",
+    "command": "gcc -m32 -ffreestanding -fno-pie -fno-stack-protector -nostdlib -Wall -Wextra -I src/kernel/include -c src/kernel/drivers/vga.c",
+    "file": "src/kernel/drivers/vga.c"
+  },
+  {
+    "directory": "/home/julian/Projects/test_os",
+    "command": "gcc -m32 -ffreestanding -fno-pie -fno-stack-protector -nostdlib -Wall -Wextra -I src/kernel/include -c src/kernel/drivers/keyboard.c",
+    "file": "src/kernel/drivers/keyboard.c"
+  },
+  {
+    "directory": "/home/julian/Projects/test_os",
+    "command": "gcc -m32 -ffreestanding -fno-pie -fno-stack-protector -nostdlib -Wall -Wextra -I src/kernel/include -c src/kernel/lib/string.c",
+    "file": "src/kernel/lib/string.c"
+  },
+  {
+    "directory": "/home/julian/Projects/test_os",
+    "command": "gcc -m32 -ffreestanding -fno-pie -fno-stack-protector -nostdlib -Wall -Wextra -I src/kernel/include -c src/kernel/shell/shell.c",
+    "file": "src/kernel/shell/shell.c"
+  }
+]
