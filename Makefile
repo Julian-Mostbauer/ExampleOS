@@ -14,6 +14,7 @@ C_SRCS := src/kernel/kernel.c \
           src/kernel/cpu/pic.c \
           src/kernel/drivers/vga.c \
           src/kernel/drivers/keyboard.c \
+          src/kernel/drivers/timer.c \
           src/kernel/lib/string.c \
           src/kernel/shell/shell.c \
           src/kernel/shell/pong.c

@@ -4,6 +4,7 @@
 #include "string.h"
 #include "version.h"
 #include "pong.h"
+#include "timer.h"
 
 void shell_run(void) {
     char input[64];
@@ -27,6 +28,8 @@ void shell_run(void) {
             vga_print("  about          - Display system information\n");
             vga_print("  echo           - prints given message\n");
             vga_print("  paint          - Switch to 320x200 graphics mode and paint pixels\n");
+            vga_print("  pong           - Play Pong game\n");
+            vga_print("  sleep <sec>    - Sleep for specified seconds (non-busy)\n");
             vga_print("  shutdown       - Ends the running os\n");
             vga_print("  help           - Show this help menu\n");
         } else if (strcmp(input, "layout de") == 0 || strcmp(input, "de") == 0) {
@@ -86,6 +89,19 @@ void shell_run(void) {
             vga_clear();
         } else if (strcmp(input, "pong") == 0) {
             pong();
+        } else if (strncmp(input, "sleep", 5) == 0) {
+            uint32_t secs = 1;
+            if (input[5] == ' ' && input[6] >= '0' && input[6] <= '9') {
+                secs = 0;
+                int i = 6;
+                while (input[i] >= '0' && input[i] <= '9') {
+                    secs = secs * 10 + (uint32_t)(input[i] - '0');
+                    i++;
+                }
+            }
+            vga_print("Sleeping...\n");
+            sleep(secs);
+            vga_print("Awake!\n");
         } else {
             vga_print_color("Unknown command: '", MAKE_COLOR(COLOR_WHITE, COLOR_BLACK));
             vga_print_color(input, MAKE_COLOR(COLOR_YELLOW, COLOR_BLACK));

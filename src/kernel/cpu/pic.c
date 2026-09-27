@@ -34,8 +34,8 @@ void pic_remap(void) {
     outb(PIC2_DATA, ICW4_8086);
     io_wait();
 
-    // Mask all interrupts except IRQ 1 (Keyboard: bit 1 = 0)
-    outb(PIC1_DATA, 0xFD); // 1111 1101
+    // Mask all interrupts except IRQ 0 (Timer: bit 0) and IRQ 1 (Keyboard: bit 1)
+    outb(PIC1_DATA, 0xFC); // 1111 1100
     outb(PIC2_DATA, 0xFF); // all disabled on slave
 }
 

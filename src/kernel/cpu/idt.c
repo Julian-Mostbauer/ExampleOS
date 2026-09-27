@@ -4,6 +4,7 @@
 static struct idt_entry idt[256];
 static struct idt_ptr   idtp;
 
+extern void isr_timer(void);
 extern void isr_keyboard(void);
 
 void idt_set_gate(int n, uint32_t handler) {
@@ -21,7 +22,8 @@ void idt_init(void) {
     // Remap PIC before loading IDT
     pic_remap();
 
-    // Register IRQ1 (vector 0x21 = 33)
+    // Register IRQ0 (vector 0x20 = 32, Timer) and IRQ1 (vector 0x21 = 33, Keyboard)
+    idt_set_gate(0x20, (uint32_t)isr_timer);
     idt_set_gate(0x21, (uint32_t)isr_keyboard);
 
     // Load IDT register

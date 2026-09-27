@@ -1,12 +1,7 @@
 #include "pong.h"
 #include "vga.h"
 #include "keyboard.h"
-
-static void frame_delay(uint32_t count) {
-    for (volatile uint32_t i = 0; i < count; i++) {
-        __asm__ volatile("nop");
-    }
-}
+#include "timer.h"
 
 static short abs(const short x) {
     return (x < 0) ? -x : x;
@@ -219,8 +214,8 @@ void pong(void) {
         prev_ball_x = ball_x;
         prev_ball_y = ball_y;
 
-        // --- 6. Frame pacing ---
-        frame_delay(4000000);
+        // --- 6. Hardware timer frame pacing (60 FPS, non-busy-waiting) ---
+        sleep_ms(16);
     }
 
     // Restore text mode 03h and font when exiting
