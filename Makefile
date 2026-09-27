@@ -18,6 +18,7 @@ C_SRCS := src/kernel/kernel.c \
           src/kernel/lib/string.c \
           src/kernel/lib/io_helper.c \
           src/kernel/lib/math.c \
+          src/kernel/lib/rand.c \
           src/kernel/shell/shell.c \
           src/kernel/shell/pong.c
 

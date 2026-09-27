@@ -1,4 +1,5 @@
 #include "shell.h"
+#include "rand.h"
 
 #include "io_helper.h"
 #include "vga.h"
@@ -32,6 +33,7 @@ void shell_run(void) {
             vga_print("  echo           - prints given message\n");
             vga_print("  paint          - Switch to 320x200 graphics mode and paint pixels\n");
             vga_print("  pong           - Play Pong game\n");
+            vga_print("  rand           - Print random numbers\n");
             vga_print("  sleep <sec>    - Sleep for specified seconds (non-busy)\n");
             vga_print("  uptime         - Show how long the system has been running for\n");
             vga_print("  shutdown       - Ends the running os\n");
@@ -93,6 +95,10 @@ void shell_run(void) {
             vga_clear();
         } else if (strcmp(input, "pong") == 0) {
             pong();
+        } else if (strcmp(input, "rand") == 0) {
+            char buf[7];
+            sprintf(buf, "%d\n", rand());
+            vga_print(buf);
         } else if (strcmp(input, "uptime") == 0) {
             const uint32_t TICKS = timer_get_ticks();
             char buf[100];
