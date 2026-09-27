@@ -36,6 +36,16 @@
   },
   {
     "directory": "/home/julian/Projects/test_os",
+    "command": "gcc -m32 -ffreestanding -fno-pie -fno-stack-protector -nostdlib -Wall -Wextra -I src/kernel/include -c src/kernel/lib/io_helper.c",
+    "file": "src/kernel/lib/io_helper.c"
+  },
+  {
+    "directory": "/home/julian/Projects/test_os",
+    "command": "gcc -m32 -ffreestanding -fno-pie -fno-stack-protector -nostdlib -Wall -Wextra -I src/kernel/include -c src/kernel/lib/math.c",
+    "file": "src/kernel/lib/math.c"
+  },
+  {
+    "directory": "/home/julian/Projects/test_os",
     "command": "gcc -m32 -ffreestanding -fno-pie -fno-stack-protector -nostdlib -Wall -Wextra -I src/kernel/include -c src/kernel/shell/shell.c",
     "file": "src/kernel/shell/shell.c"
   },

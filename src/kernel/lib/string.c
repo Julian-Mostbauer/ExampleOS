@@ -24,3 +24,57 @@ size_t strlen(const char *str) {
     }
     return len;
 }
+
+
+char *append_char(char *out, char c)
+{
+    *out++ = c;
+    return out;
+}
+
+char *append_string(char *out, const char *str)
+{
+    while (*str)
+        *out++ = *str++;
+
+    return out;
+}
+
+char *append_unsigned(char *out, uint64_t value, const int base)
+{
+    char buffer[32];
+    int i = 0;
+
+    if (value == 0)
+        return append_char(out, '0');
+
+    while (value > 0) {
+        const unsigned digit = value % base;
+
+        if (digit < 10)
+            buffer[i++] = '0' + digit;
+        else
+            buffer[i++] = 'a' + (digit - 10);
+
+        value /= base;
+    }
+
+    while (i > 0)
+        *out++ = buffer[--i];
+
+    return out;
+}
+
+char *append_signed(char *out, const int64_t value)
+{
+    if (value < 0) {
+        *out++ = '-';
+
+        /*
+         * Avoid -LONG_MIN overflowing.
+         */
+        return append_unsigned(out, -(unsigned long)value, 10);
+    }
+
+    return append_unsigned(out, (unsigned long)value, 10);
+}
