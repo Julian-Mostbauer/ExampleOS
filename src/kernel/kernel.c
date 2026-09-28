@@ -1,4 +1,5 @@
 #include "idt.h"
+#include "pmm.h"
 #include "timer.h"
 #include "vga.h"
 #include "keyboard.h"
@@ -8,6 +9,8 @@ void kmain(void) {
     vga_init();
 
     idt_init();
+
+    pmm_init();
 
     timer_init(TIMER_FREQUENCY_HZ);
 

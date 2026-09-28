@@ -1,5 +1,6 @@
 #include "shell.h"
 #include "rand.h"
+#include "pmm.h"
 
 #include "io_helper.h"
 #include "vga.h"
@@ -36,6 +37,7 @@ void shell_run(void) {
             vga_print("  rand           - Print random numbers\n");
             vga_print("  sleep <sec>    - Sleep for specified seconds (non-busy)\n");
             vga_print("  uptime         - Show how long the system has been running for\n");
+            vga_print("  mem            - Show physical memory status and free frames\n");
             vga_print("  divzero        - Test CPU divide-by-zero exception handler\n");
             vga_print("  shutdown       - Ends the running os\n");
             vga_print("  help           - Show this help menu\n");
@@ -109,6 +111,22 @@ void shell_run(void) {
             const uint32_t TICKS = timer_get_ticks();
             char buf[100];
             sprintf(buf, "System has been running for %d ticks (%d Seconds)\n",TICKS, TICKS / 1000);
+            vga_print(buf);
+        } else if (strcmp(input, "mem") == 0 || strcmp(input, "free") == 0) {
+            uint32_t total = pmm_get_total_memory();
+            uint32_t used_blk = pmm_get_used_blocks();
+            uint32_t free_blk = pmm_get_free_blocks();
+            uint32_t total_blk = pmm_get_total_blocks();
+
+            char buf[96];
+            vga_print_color("--- Physical Memory Summary ---\n", MAKE_COLOR(COLOR_CYAN, COLOR_BLACK));
+            sprintf(buf, "Total RAM:   %u MB (%u KB)\n", total / (1024 * 1024), total / 1024);
+            vga_print(buf);
+            sprintf(buf, "Used Blocks: %u (%u KB)\n", used_blk, (used_blk * 4) );
+            vga_print(buf);
+            sprintf(buf, "Free Blocks: %u (%u KB)\n", free_blk, (free_blk * 4) );
+            vga_print(buf);
+            sprintf(buf, "Block Size:  4096 bytes (4 KB) across %u frames\n", total_blk);
             vga_print(buf);
         } else if (strncmp(input, "sleep", 5) == 0) {
             uint32_t secs = 1;

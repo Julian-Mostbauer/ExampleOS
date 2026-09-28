@@ -16,6 +16,11 @@
   },
   {
     "directory": "/home/julian/Projects/test_os",
+    "command": "gcc -m32 -ffreestanding -fno-pie -fno-stack-protector -nostdlib -Wall -Wextra -I src/kernel/include -c src/kernel/cpu/pmm.c",
+    "file": "src/kernel/cpu/pmm.c"
+  },
+  {
+    "directory": "/home/julian/Projects/test_os",
     "command": "gcc -m32 -ffreestanding -fno-pie -fno-stack-protector -nostdlib -Wall -Wextra -I src/kernel/include -c src/kernel/cpu/pic.c",
     "file": "src/kernel/cpu/pic.c"
   },
