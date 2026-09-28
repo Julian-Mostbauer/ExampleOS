@@ -41,6 +41,11 @@
   },
   {
     "directory": "/home/julian/Projects/test_os",
+    "command": "gcc -m32 -ffreestanding -fno-pie -fno-stack-protector -nostdlib -Wall -Wextra -I src/kernel/include -c src/kernel/lib/memory.c",
+    "file": "src/kernel/lib/memory.c"
+  },
+  {
+    "directory": "/home/julian/Projects/test_os",
     "command": "gcc -m32 -ffreestanding -fno-pie -fno-stack-protector -nostdlib -Wall -Wextra -I src/kernel/include -c src/kernel/lib/io_helper.c",
     "file": "src/kernel/lib/io_helper.c"
   },

@@ -17,6 +17,7 @@ C_SRCS := src/kernel/kernel.c \
           src/kernel/drivers/keyboard.c \
           src/kernel/drivers/timer.c \
           src/kernel/lib/string.c \
+          src/kernel/lib/memory.c \
           src/kernel/lib/io_helper.c \
           src/kernel/lib/math.c \
           src/kernel/lib/rand.c \

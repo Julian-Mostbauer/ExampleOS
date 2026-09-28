@@ -1,6 +1,7 @@
 #include "vga.h"
 #include "io.h"
 #include "version.h"
+#include "memory.h"
 
 static int cursor_row = 1;
 static int cursor_col = 0;
@@ -239,10 +240,7 @@ void vga_draw_rect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t color
 }
 
 void vga_clear_screen_color(uint8_t color) {
-    volatile uint8_t *video = (volatile uint8_t *)VGA_VIDEO_ADDR;
-    for (uint32_t i = 0; i < VGA_GFX_WIDTH * VGA_GFX_HEIGHT; i++) {
-        video[i] = color;
-    }
+    memset((void *)VGA_VIDEO_ADDR, color, VGA_GFX_WIDTH * VGA_GFX_HEIGHT);
 }
 
 void vga_clear(void) {
@@ -274,12 +272,11 @@ void vga_clear_absolute(void){
 static void vga_scroll(void) {
     volatile char *video = (volatile char *)VGA_TEXT_ADDR;
     if (cursor_row >= VGA_HEIGHT) {
-        // Shift rows 1..23 up by 1 (preserving row 0 status bar)
-        for (int r = 1; r < VGA_HEIGHT - 1; r++) {
-            for (int c = 0; c < VGA_WIDTH * 2; c++) {
-                video[(r * VGA_WIDTH * 2) + c] = video[((r + 1) * VGA_WIDTH * 2) + c];
-            }
-        }
+        // Shift rows 1..23 up by 1 (preserving row 0 status bar) via fast block copy
+        memmove((void *)(video + VGA_WIDTH * 2),
+                (const void *)(video + (VGA_WIDTH * 2 * 2)),
+                (VGA_HEIGHT - 2) * VGA_WIDTH * 2);
+
         // Clear bottom row
         int last_line = (VGA_HEIGHT - 1) * VGA_WIDTH * 2;
         for (int i = 0; i < VGA_WIDTH; i++) {

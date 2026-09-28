@@ -2,6 +2,7 @@
 #include "io.h"
 #include "pic.h"
 #include "vga.h"
+#include "memory.h"
 
 static volatile keyboard_layout_t current_layout = LAYOUT_DE;
 
@@ -228,9 +229,7 @@ void keyboard_isr_handler(void) {
 }
 
 void keyboard_init(void) {
-    for (int i = 0; i < 256; i++) {
-        key_states[i] = 0;
-    }
+    memset((void *)key_states, 0, sizeof(key_states));
     kb_head = 0;
     kb_tail = 0;
     keyboard_set_layout(LAYOUT_DE);
