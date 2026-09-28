@@ -6,6 +6,7 @@ static struct idt_ptr   idtp;
 
 extern void isr_timer(void);
 extern void isr_keyboard(void);
+extern void *isr_stub_table[32];
 
 void idt_set_gate(int n, uint32_t handler) {
     idt[n].offset_low  = (uint16_t)(handler & 0xFFFF);
@@ -18,6 +19,11 @@ void idt_set_gate(int n, uint32_t handler) {
 void idt_init(void) {
     idtp.limit = (sizeof(struct idt_entry) * 256) - 1;
     idtp.base  = (uint32_t)&idt;
+
+    // Register CPU exception handlers (vectors 0..31)
+    for (int i = 0; i < 32; i++) {
+        idt_set_gate(i, (uint32_t)isr_stub_table[i]);
+    }
 
     // Remap PIC before loading IDT
     pic_remap();

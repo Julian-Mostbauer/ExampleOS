@@ -36,6 +36,7 @@ void shell_run(void) {
             vga_print("  rand           - Print random numbers\n");
             vga_print("  sleep <sec>    - Sleep for specified seconds (non-busy)\n");
             vga_print("  uptime         - Show how long the system has been running for\n");
+            vga_print("  divzero        - Test CPU divide-by-zero exception handler\n");
             vga_print("  shutdown       - Ends the running os\n");
             vga_print("  help           - Show this help menu\n");
         } else if (strcmp(input, "layout de") == 0 || strcmp(input, "de") == 0) {
@@ -56,10 +57,15 @@ void shell_run(void) {
             vga_print("Architecture: x86 32-bit Protected Mode\n");
             vga_print("Subsystems: CPU (IDT, PIC), Drivers (VGA, Keyboard), Lib, Shell\n");
         } else if (strncmp(input, "echo", 4) == 0) {
-            char *msg = input;
-            msg += 5;
-            vga_print(msg);
+            if (strlen(input) > 5) {
+                vga_print(input + 5);
+            }
             vga_print("\n");
+        } else if (strcmp(input, "divzero") == 0) {
+            vga_print("Triggering CPU divide-by-zero exception (#DE)...\n");
+            volatile int zero = 0;
+            volatile int res = 100 / zero;
+            (void)res;
         } else if (strcmp(input, "shutdown") == 0) {
             vga_clear_absolute();
             break;

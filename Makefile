@@ -11,6 +11,7 @@ BUILD_DIR := build
 # C source files across subsystems
 C_SRCS := src/kernel/kernel.c \
           src/kernel/cpu/idt.c \
+          src/kernel/cpu/panic.c \
           src/kernel/cpu/pic.c \
           src/kernel/drivers/vga.c \
           src/kernel/drivers/keyboard.c \
