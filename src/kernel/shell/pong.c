@@ -1,7 +1,9 @@
 #include "pong.h"
+#include "math.h"
 #include "vga.h"
 #include "keyboard.h"
 #include "timer.h"
+#include "rand.h"
 
 static short abs(const short x) {
     return (x < 0) ? -x : x;
@@ -156,8 +158,11 @@ void pong(void) {
             ball_y = (VGA_GFX_HEIGHT - BALL_SIZE) / 2;
             prev_ball_x = ball_x;
             prev_ball_y = ball_y;
-            ball_vel_x = -3; // Serve towards P1
-            ball_vel_y = 1;
+            ball_vel_x = (rand() % 8)-4; 
+            ball_vel_y = (rand() % 8)-4;
+	    if (ABS(ball_vel_x) < 1){
+	    	ball_vel_x += 1;
+	    }
             draw_net();
         }
         // P2 missed (Ball passed right wall) -> P1 scores
