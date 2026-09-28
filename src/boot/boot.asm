@@ -1,5 +1,5 @@
 bits 16
-org 0x7c00
+org 0x0600
 
 KERNEL_OFFSET equ 0x1000
 
@@ -10,17 +10,33 @@ start:
     mov ds, ax
     mov es, ax
     mov ss, ax
-    mov sp, 0x7c00
+    mov sp, 0x0600          ; Stack below bootloader at 0x0600, grows downward
     sti
 
-    mov [BOOT_DRIVE], dl    ; BIOS saves boot drive number in DL
+    mov dh, dl              ; Preserve BIOS boot drive from DL
+
+    ; --------------------------------------------------------
+    ; Relocate bootloader: BIOS loaded us at 0x7C00.
+    ; Copy 512 bytes (256 words) to 0x0600 to prevent kernel
+    ; load at 0x1000 from ever overwriting bootloader code.
+    ; --------------------------------------------------------
+    cld
+    mov si, 0x7c00
+    mov di, 0x0600
+    mov cx, 256
+    rep movsw
+
+    jmp 0x0000:relocated
+
+relocated:
+    mov [BOOT_DRIVE], dh    ; Save preserved boot drive number
 
     ; --------------------------------------------------------
     ; 1. Load C kernel from disk into RAM at KERNEL_OFFSET
     ; --------------------------------------------------------
     mov bx, KERNEL_OFFSET   ; ES:BX is target buffer (0x0000:0x1000)
     mov ah, 0x02            ; BIOS read sector function
-    mov al, 31              ; Number of sectors to read (31 * 512 = 15.5 KB)
+    mov al, 64              ; Number of sectors to read (64 * 512 = 32 KB)
     mov ch, 0               ; Cylinder 0
     mov cl, 2               ; Sector 2 (Sector 1 is this bootloader)
     mov dh, 0               ; Head 0

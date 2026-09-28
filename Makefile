@@ -47,10 +47,10 @@ $(BUILD_DIR)/kernel/%.o: $(SRC_DIR)/kernel/%.c
 $(BUILD_DIR)/kernel.bin: $(BUILD_DIR)/kernel_entry.o $(C_OBJS) $(SRC_DIR)/kernel/linker.ld
 	$(LD) $(LDFLAGS) $(BUILD_DIR)/kernel_entry.o $(C_OBJS) -o $@
 
-# 5. Raw bootable disk image (padded to 16KB)
+# 5. Raw bootable disk image (padded to 64KB)
 $(OS_BIN): $(BUILD_DIR)/boot.bin $(BUILD_DIR)/kernel.bin
 	cat $(BUILD_DIR)/boot.bin $(BUILD_DIR)/kernel.bin > $@
-	truncate -s 16K $@
+	truncate -s 64K $@
 
 # 6. Bootable ISO Image (El Torito Floppy Emulation)
 OS_ISO := $(BUILD_DIR)/os.iso
