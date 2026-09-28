@@ -71,10 +71,10 @@ char *append_signed(char *out, const int64_t value)
         *out++ = '-';
 
         /*
-         * Avoid -LONG_MIN overflowing.
+         * Avoid -INT64_MIN overflowing.
          */
-        return append_unsigned(out, -(unsigned long)value, 10);
+        return append_unsigned(out, (uint64_t)(-(uint64_t)value), 10);
     }
 
-    return append_unsigned(out, (unsigned long)value, 10);
+    return append_unsigned(out, (uint64_t)value, 10);
 }

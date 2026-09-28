@@ -14,4 +14,9 @@
 
 uint32_t log10_ceil (uint32_t x);
 
+uint64_t __udivdi3(uint64_t a, uint64_t b);
+uint64_t __umoddi3(uint64_t a, uint64_t b);
+int64_t __divdi3(int64_t a, int64_t b);
+int64_t __moddi3(int64_t a, int64_t b);
+
 #endif //TEST_OS_MATH_H
